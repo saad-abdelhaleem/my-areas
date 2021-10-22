@@ -2,13 +2,13 @@
 
 const Index = function () {
 
+    let markersArr = [];
+
     let _addMarker = function () {
         setTimeout(function () {
             _map.addListener("click", (mapsMouseEvent) => {
 
                 let _location = mapsMouseEvent.latLng.toJSON();
-
-                areaBoundariesArr.push(_location);
 
                 let _markerNumber = markersArr.length + 1;
                 const _marker = new google.maps.Marker({
@@ -22,11 +22,11 @@ const Index = function () {
                 markersArr.push(_marker);
 
                 let isExist = false;
-                if (myAreasArr.length > 0) {
-                    for (var i = 0; i < myAreasArr.length; i++) {
-                        let polygon = myAreasArr[i].area;
+                if (mapAreasArr.length > 0) {
+                    for (var i = 0; i < mapAreasArr.length; i++) {
+                        let polygon = mapAreasArr[i].area;
                         if (google.maps.geometry.poly.containsLocation(_marker.getPosition(), polygon)) {
-                            _addLog(`Merker #${_markerNumber} inside the area: (${myAreasArr[i].name})`);
+                            _addLog(`Merker #${_markerNumber} inside the area: (${mapAreasArr[i].name})`);
                             isExist = true;
                             break;
                         }
@@ -55,7 +55,7 @@ function initMap() {
     _map = new google.maps.Map(document.getElementById("map"), {
         zoom: 12,
         center: defaultLatlng,
-        mapTypeId: "hybrid",
+        mapTypeId: google.maps.MapTypeId.ROADMAP//"hybrid",
     });
 
     const boundaries = [
@@ -68,12 +68,15 @@ function initMap() {
         { lat: 30.042122, lng: 31.1912467 },
     ];
 
-    let area = _drawAnArea(boundaries);
-    let areaItem = { name: 'default area', area: area };
+    _renderSavedAreas();
 
-    _setAreaName(areaItem.name, boundaries[0]);
+    let defaultArea = _drawAnArea(boundaries);
+    let areaName= 'Bolaq Dakror';
 
-    myAreasArr.push(areaItem);
+    _setAreaName(areaName, boundaries[0]);
+
+    _saveAnArea(areaName, boundaries);
+    mapAreasArr.push({ name: areaName, area: defaultArea });
 
     return _map;
 }
